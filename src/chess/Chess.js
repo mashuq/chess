@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { move } from '../actions/chessActions'
 import Square from './Square'
 import styled from 'styled-components'
 
@@ -24,7 +23,7 @@ class Chess extends React.Component {
                     let piece = this.props.chess.pieces.filter(obj => {
                         return obj.row == value.row && obj.col == value.col;
                     })   
-                    return <Square row={value.row} col={value.col} color={value.color} piece={piece[0]} />
+                    return <Square row={value.row} col={value.col} color={value.color} piece={piece[0]} key={value.id} id={value.id} />
                 })}
             </ChessBoard>
         )
@@ -39,11 +38,7 @@ const mapStateToProps = (state) => {
     }
 }
 
-const mapDispatchToProps = (dispatch) => ({
-    doMove: () => dispatch(move('x'))
-})
-
 export default connect(
     mapStateToProps,
-    mapDispatchToProps
+    {}
 )(Chess)

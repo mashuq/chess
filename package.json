@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "chess": "^0.4.1",
     "immer": "^2.1.3",
     "immutable": "^4.0.0-rc.12",
     "react": "^16.8.4",

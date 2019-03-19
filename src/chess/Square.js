@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
-
+import { move } from '../actions/chessActions'
+import { connect } from 'react-redux'
 import whitepawn from '../images/whitepawn.png'
 import blackpawn from '../images/blackpawn.png'
 import whiterook from '../images/whiterook.png'
@@ -53,14 +54,42 @@ class Square extends React.Component {
             piece = this.props.piece.color + this.props.piece.type;
         }
         return (
-            <StyledSquare color={this.props.color}>
+            <StyledSquare color={this.props.color} 
+                onDragOver={(e)=>this.onDragOver(e)} 
+                onDrop={(e)=>{this.props.onDrop(e, this.props)}} >
                 {null != piece &&
-                    <Piece src={pieces[piece]} />
+                    <Piece src={pieces[piece]} 
+                    draggable 
+                    onDragStart={(e)=>this.onDragStart(e, this.props.piece)} 
+                    />
                 }
             </StyledSquare>
         )
     }
 
+    onDragStart = (event, data) =>{
+        console.log(data);
+        event.dataTransfer.setData("application/json", JSON.stringify(data));
+    
+             
+    }
+
+    onDragOver = (event) => {
+        event.stopPropagation();
+        event.preventDefault();
+    }   
+
 }   
 
-export default Square;
+const mapDispatchToProps = (dispatch) => ({
+    onDrop: (event, data) => {     
+        let payload = {draggedPiece : JSON.parse(event.dataTransfer.getData('application/json')), droppedSquare : data};
+        dispatch(move(payload))       
+    }   
+})
+
+export default connect(
+    null,
+    mapDispatchToProps
+)(Square)
+
