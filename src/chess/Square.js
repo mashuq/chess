@@ -31,15 +31,15 @@ const pieces = {
 }
 
 const StyledSquare = styled.div`
-    width:100px;
-    height:100px;
+    width:90px;
+    height:90px;
     float:left;
     background-color: ${props => props.color};
 `
 
 const Piece = styled.img`
-    width:100px;
-    height:100px;
+    width:90px;
+    height:90px;
 `
 
 class Square extends React.Component {
@@ -54,9 +54,9 @@ class Square extends React.Component {
             piece = this.props.piece.color + this.props.piece.type;
         }
         return (
-            <StyledSquare color={this.props.color} 
+            <StyledSquare color={this.props.square.color} 
                 onDragOver={(e)=>this.onDragOver(e)} 
-                onDrop={(e)=>{this.props.onDrop(e, this.props)}} >
+                onDrop={(e)=>{this.props.onDrop(e, this.props.square)}} >
                 {null != piece &&
                     <Piece src={pieces[piece]} 
                     draggable 
@@ -68,7 +68,10 @@ class Square extends React.Component {
     }
 
     onDragStart = (event, data) =>{
-        console.log(data);
+        if(data.color == 'black'){
+            event.stopPropagation();
+            event.preventDefault();
+        }
         event.dataTransfer.setData("application/json", JSON.stringify(data));
     
              

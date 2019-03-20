@@ -8,11 +8,11 @@ import rootReducer from './reducers'
 
 const store = createStore(rootReducer);
 
-
 ReactDOM.render(
-<Provider store={store}>
-    <Chess />
-</Provider>
-, document.getElementById('root'));
+    <Provider store={store}>
+        <Chess />
+    </Provider>
+
+    , document.getElementById('root'));
 
 serviceWorker.unregister();

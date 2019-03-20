@@ -2,11 +2,13 @@ import React from 'react'
 import { connect } from 'react-redux'
 import Square from './Square'
 import styled from 'styled-components'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ChessBoard = styled.div`
-    width:800px;
-    height:800px;
-    float:left; 
+    width:720px;
+    height:720px;
+    margin:auto;
     border: 1px solid black;
 `
 
@@ -17,15 +19,21 @@ class Chess extends React.Component {
     }
 
     render() {
-        return (
-            <ChessBoard>
-                {this.props.chess.board.map((value, index) => {
-                    let piece = this.props.chess.pieces.filter(obj => {
-                        return obj.row == value.row && obj.col == value.col;
-                    })   
-                    return <Square row={value.row} col={value.col} color={value.color} piece={piece[0]} key={value.id} id={value.id} />
-                })}
-            </ChessBoard>
+        if(this.props.chess.error){
+            toast(this.props.chess.error);                    
+        }
+        return (            
+            <div>
+                <ChessBoard>
+                    {this.props.chess.board.map((value, index) => {
+                        let piece = this.props.chess.pieces.filter(obj => {
+                            return obj.row == value.row && obj.col == value.col;
+                        })
+                        return <Square square={value} piece={piece[0]} key={value.id} />
+                    })}
+                </ChessBoard>
+                <ToastContainer autoClose={2000} toastClassName="dark-toast"/>
+            </div>
         )
     }
 }
