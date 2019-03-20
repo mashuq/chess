@@ -1,7 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import { move } from '../actions/chessActions'
+import { whitemove } from '../actions/chessActions'
+import { blackmove } from '../actions/chessActions'
 import { connect } from 'react-redux'
+import _ from 'lodash'
 import whitepawn from '../images/whitepawn.png'
 import blackpawn from '../images/blackpawn.png'
 import whiterook from '../images/whiterook.png'
@@ -84,10 +86,15 @@ class Square extends React.Component {
 
 }   
 
+const moveBlack = (dispatch) => {
+    dispatch(blackmove());
+}
+
 const mapDispatchToProps = (dispatch) => ({
     onDrop: (event, data) => {     
         let payload = {draggedPiece : JSON.parse(event.dataTransfer.getData('application/json')), droppedSquare : data};
-        dispatch(move(payload))       
+        dispatch(whitemove(payload));
+        _.delay( moveBlack, 2000, dispatch );       
     }   
 })
 

@@ -19,19 +19,19 @@ const black = 'black',
 
 
 let gamestate = {
-    chess: { board: createBoard(), pieces: setPieces(), engine:chess.create(), error:'' }
+    chess: { board: createBoard(), pieces: setPieces(), engine:chess.create({ PGN : true }), error:'' }
 }
 
 function createBoard() {
     let board = [];
     let color = true;
-    for (let col = 8; col > 0; col--) {
-        for (let row = 0; row < 8; row++) {
-            if (row != 0) color = !color;
+    for (let rank = 8; rank > 0; rank--) {
+        for (let file = 0; file < 8; file++) {
+            if (file != 0) color = !color;
             let square = {};
-            square.row = String.fromCharCode(startCode + row);
-            square.col = col;
-            square.id = square.row + square.col;
+            square.file = String.fromCharCode(startCode + file);
+            square.rank = rank;
+            square.id = square.file + square.rank;
             if (color) square.color = white;
             else square.color = black;
             board.push(square);
@@ -43,56 +43,56 @@ function createBoard() {
 
 function setPieces() {
     let pieces = [];
-    let row = 0;
+    let file = 0;
     //setting the black pawns
-    let col = 7;
-    for (row = 0; row < 8; row++) {
-        pieces.push({ row: String.fromCharCode(startCode + row), col: col, type: pawn, color: black, notation: pawnNotation });
+    let rank = 7;
+    for (file = 0; file < 8; file++) {
+        pieces.push({ file: String.fromCharCode(startCode + file), rank: rank, type: pawn, color: black, notation: pawnNotation });
     }
     //setting black rooks
-    col = 8;
-    for (row of [0, 7]) {
-        pieces.push({ row: String.fromCharCode(startCode + row), col: col, type: rook, color: black, notation: rookNotation });
+    rank = 8;
+    for (file of [0, 7]) {
+        pieces.push({ file: String.fromCharCode(startCode + file), rank: rank, type: rook, color: black, notation: rookNotation });
     }
     //Stting black knights
-    for (row of [1, 6]) {
-        pieces.push({ row: String.fromCharCode(startCode + row), col: col, type: knight, color: black, notation: knightNotation });
+    for (file of [1, 6]) {
+        pieces.push({ file: String.fromCharCode(startCode + file), rank: rank, type: knight, color: black, notation: knightNotation });
     }
     //Stting black bishops
-    for (row of [2, 5]) {
-        pieces.push({ row: String.fromCharCode(startCode + row), col: col, type: bishop, color: black, notation: bishopNotation });
+    for (file of [2, 5]) {
+        pieces.push({ file: String.fromCharCode(startCode + file), rank: rank, type: bishop, color: black, notation: bishopNotation });
     }
     //Setting black king
-    row = 3;
-    pieces.push({ row: String.fromCharCode(startCode + row), col: col, type: king, color: black, notation: kingNotation });
+    file = 3;
+    pieces.push({ file: String.fromCharCode(startCode + file), rank: rank, type: king, color: black, notation: kingNotation });
     //Setting black queen
-    row = 4;
-    pieces.push({ row: String.fromCharCode(startCode + row), col: col, type: queen, color: black, notation: queenNotation });
+    file = 4;
+    pieces.push({ file: String.fromCharCode(startCode + file), rank: rank, type: queen, color: black, notation: queenNotation });
 
     //setting the white pawns
-    col = 2;
-    for (row = 0; row < 8; row++) {
-        pieces.push({ row: String.fromCharCode(startCode + row), col: col, type: pawn, color: white, notation: pawnNotation });
+    rank = 2;
+    for (file = 0; file < 8; file++) {
+        pieces.push({ file: String.fromCharCode(startCode + file), rank: rank, type: pawn, color: white, notation: pawnNotation });
     }
     //setting white rooks
-    col = 1;
-    for (row of [0, 7]) {
-        pieces.push({ row: String.fromCharCode(startCode + row), col: col, type: rook, color: white, notation: rookNotation });
+    rank = 1;
+    for (file of [0, 7]) {
+        pieces.push({ file: String.fromCharCode(startCode + file), rank: rank, type: rook, color: white, notation: rookNotation });
     }
     //Stting white knights
-    for (row of [1, 6]) {
-        pieces.push({ row: String.fromCharCode(startCode + row), col: col, type: knight, color: white, notation: knightNotation });
+    for (file of [1, 6]) {
+        pieces.push({ file: String.fromCharCode(startCode + file), rank: rank, type: knight, color: white, notation: knightNotation });
     }
     //Stting white bishops
-    for (row of [2, 5]) {
-        pieces.push({ row: String.fromCharCode(startCode + row), col: col, type: bishop, color: white, notation: bishopNotation });
+    for (file of [2, 5]) {
+        pieces.push({ file: String.fromCharCode(startCode + file), rank: rank, type: bishop, color: white, notation: bishopNotation });
     }
     //Setting white king
-    row = 3;
-    pieces.push({ row: String.fromCharCode(startCode + row), col: col, type: king, color: white, notation: knightNotation });
+    file = 3;
+    pieces.push({ file: String.fromCharCode(startCode + file), rank: rank, type: king, color: white, notation: knightNotation });
     //Setting white queen
-    row = 4;
-    pieces.push({ row: String.fromCharCode(startCode + row), col: col, type: queen, color: white, notation: queenNotation });
+    file = 4;
+    pieces.push({ file: String.fromCharCode(startCode + file), rank: rank, type: queen, color: white, notation: queenNotation });
 
 
 

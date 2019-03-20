@@ -1,3 +1,4 @@
 export const CHESS = {
-    MOVE: 'MOVE'
+    WHITEMOVE: 'WHITEMOVE',
+    BLACKMOVE: 'BLACKMOVE'
 }

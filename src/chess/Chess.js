@@ -27,7 +27,7 @@ class Chess extends React.Component {
                 <ChessBoard>
                     {this.props.chess.board.map((value, index) => {
                         let piece = this.props.chess.pieces.filter(obj => {
-                            return obj.row == value.row && obj.col == value.col;
+                            return obj.file == value.file && obj.rank == value.rank;
                         })
                         return <Square square={value} piece={piece[0]} key={value.id} />
                     })}
@@ -37,8 +37,6 @@ class Chess extends React.Component {
         )
     }
 }
-
-
 
 const mapStateToProps = (state) => {
     return {

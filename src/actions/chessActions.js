@@ -1,7 +1,12 @@
 import {CHESS} from './actiontypes'
 
-export const move = move => ({
-    type: CHESS.MOVE,
+export const whitemove = move => ({
+    type: CHESS.WHITEMOVE,
     move
+})
+ 
+
+export const blackmove = () => ({
+    type: CHESS.BLACKMOVE
 })
  

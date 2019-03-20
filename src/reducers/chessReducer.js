@@ -3,77 +3,113 @@ import { CHESS } from '../actions/actiontypes'
 import produce from "immer"
 import _ from 'lodash'
 
+const black = 'black',
+  white = 'white';
+
 const chessReducer = (state = gamestate, action) => {
   switch (action.type) {
-    case CHESS.MOVE: {
-      let error = null;
-      let move = null;
-      try {
-        let blackPiece = state.chess.pieces.filter(obj => {
-          return obj.row == action.move.droppedSquare.row && obj.col == action.move.droppedSquare.col;
-        });
-        if(blackPiece && blackPiece.length) {
-          if(action.move.draggedPiece.type == 'pawn')move = action.move.draggedPiece.row + 'x' + action.move.droppedSquare.row + action.move.droppedSquare.col;
-          else move = action.move.draggedPiece.notation + 'x' + action.move.droppedSquare.row + action.move.droppedSquare.col;
-        }
-        else move = action.move.draggedPiece.notation + action.move.droppedSquare.row + action.move.droppedSquare.col;
-        state.chess.engine.move(move);
-      } catch (e) {
-        error = 'Invalid Move ' + move;
-      }
-
-      const nextState = produce(state, draft => {
-        if (error) {
-          draft.chess.error = error;
-        } else {
-          // Moving the white piece into place
-          let whitePiece = draft.chess.pieces.filter(obj => {
-            return obj.row == action.move.draggedPiece.row && obj.col == action.move.draggedPiece.col;
-          });
-          whitePiece[0].col = action.move.droppedSquare.col;
-          whitePiece[0].row = action.move.droppedSquare.row;
-
-          //If the black piece is eaten - remove it from the board
-          let blackPiece = draft.chess.pieces.filter(obj => {
-            return obj.row == action.move.droppedSquare.row && obj.col == action.move.droppedSquare.col && obj.color == 'black';
-          });
-          if(blackPiece){
-            draft.chess.pieces = draft.chess.pieces.filter(function(x) { 
-              return blackPiece.indexOf(x) < 0;
-            });
-          }
-
-          // Let computer do the move
-          let status = state.chess.engine.getStatus();
-          let blackMoveName = _.sample(Object.keys(status.notatedMoves));
-          state.chess.engine.move(blackMoveName);
-
-          let blackMoveDetail = status.notatedMoves[blackMoveName];
-          
-          blackPiece = draft.chess.pieces.filter(obj => {
-            return obj.row == blackMoveDetail.src.file && obj.col == blackMoveDetail.src.rank;
-          });
-          blackPiece[0].col = blackMoveDetail.dest.rank;
-          blackPiece[0].row = blackMoveDetail.dest.file;
-
-          //If the white piece is eaten - remove it from the board
-          whitePiece = draft.chess.pieces.filter(obj => {
-            return obj.row == blackMoveDetail.dest.file && obj.col == blackMoveDetail.dest.rank && obj.color == 'white';
-          });
-          if(whitePiece && whitePiece.length){
-            draft.chess.pieces = draft.chess.pieces.filter(function(x) { 
-              return whitePiece.indexOf(x) < 0;
-            });
-          }
-
-          draft.chess.error = null;
-        }
-      });
-      return nextState;
+    case CHESS.WHITEMOVE: {
+      let result = validateMove(action.move.draggedPiece.file,
+        action.move.draggedPiece.rank,
+        action.move.droppedSquare.file,
+        action.move.droppedSquare.rank,
+        action.move.draggedPiece.color,
+        action.move.draggedPiece.type,
+        action.move.draggedPiece.notation,
+        state
+      );
+      return getNextState(action.move.draggedPiece.file,
+        action.move.draggedPiece.rank,
+        action.move.droppedSquare.file,
+        action.move.droppedSquare.rank,
+        action.move.draggedPiece.color,
+        state, 
+        result.error,
+        result.engine);
+    }
+    case CHESS.BLACKMOVE: {
+      let status = state.chess.engine.getStatus();
+      let moveName = _.sample(Object.keys(status.notatedMoves));
+      let moveDetails = status.notatedMoves[moveName];
+      let result = validateMove(moveDetails.src.file,
+        moveDetails.src.rank,
+        moveDetails.dest.file,
+        moveDetails.dest.rank,
+        black,
+        null,
+        null,
+        state,
+        moveName
+      );
+      return getNextState(moveDetails.src.file,
+        moveDetails.src.rank,
+        moveDetails.dest.file,
+        moveDetails.dest.rank,
+        black,
+        state, 
+        result.error,
+        result.engine);
     }
     default:
       return state
   }
 }
 
-export default chessReducer
+const getNextState = (fromFile, fromRank, toFile, toRank, color, state, error, engine) => {
+  const nextState = produce(state, draft => {
+    draft.chess.engine = engine;
+    if (error) {
+      draft.chess.error = error;
+    } else {      
+      let forwardingPiece = draft.chess.pieces.filter(obj => {
+        return obj.file == fromFile && obj.rank == fromRank;
+      });
+      forwardingPiece[0].rank = toRank;
+      forwardingPiece[0].file = toFile;
+
+      //If the opposing piece is eaten remove from board
+      let opposingPiece = draft.chess.pieces.filter(obj => {
+        return obj.file == toFile && obj.rank == toRank && obj.color == opposingColor(color);
+      });
+      if (opposingPiece && opposingPiece.length) {
+        draft.chess.pieces = draft.chess.pieces.filter(function (x) {
+          return opposingPiece.indexOf(x) < 0;
+        });
+      }
+      draft.chess.error = null;
+    }
+  });
+  return nextState;
+}
+
+const validateMove = (fromFile, fromRank, toFile, toRank, color, type, notation, state, moveName = generateMove(fromFile, fromRank, toFile, toRank, color, type, notation, state)) => {
+  let error = null;
+  let engine = state.chess.engine;
+  try {
+    engine.move(moveName);
+  } catch (e) {
+    error = 'Invalid Move ' + moveName;
+  }
+  return {error:error, engine:engine};
+}
+
+const generateMove = (fromFile, fromRank, toFile, toRank, color, type, notation, state) => {
+  let move = null;
+  let opposingPiece = state.chess.pieces.filter(obj => {
+    return obj.file == toFile && obj.rank == toRank && obj.color == opposingColor(color);
+  });
+  if (opposingPiece && opposingPiece.length) {
+    if (type == 'pawn') move = fromFile + 'x' + toFile + toRank;
+    else move = notation + 'x' + toFile + toRank;
+  }
+  else move = notation + toFile + toRank;
+  return move;
+}
+
+const opposingColor = (color) => {
+  if (color == black) return white;
+  else return black;
+}
+
+
+export default chessReducer;
