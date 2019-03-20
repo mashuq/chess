@@ -9,6 +9,9 @@ const black = 'black',
 const chessReducer = (state = gamestate, action) => {
   switch (action.type) {
     case CHESS.WHITEMOVE: {
+      if(state.chess.currentMove != white){
+        return state;
+      }
       let result = validateMove(action.move.draggedPiece.file,
         action.move.draggedPiece.rank,
         action.move.droppedSquare.file,
@@ -28,6 +31,9 @@ const chessReducer = (state = gamestate, action) => {
         result.engine);
     }
     case CHESS.BLACKMOVE: {
+      if(state.chess.currentMove != black){
+        return state;
+      }
       let status = state.chess.engine.getStatus();
       let moveName = _.sample(Object.keys(status.notatedMoves));
       let moveDetails = status.notatedMoves[moveName];
@@ -76,6 +82,7 @@ const getNextState = (fromFile, fromRank, toFile, toRank, color, state, error, e
           return opposingPiece.indexOf(x) < 0;
         });
       }
+      draft.chess.currentMove = opposingColor(color);
       draft.chess.error = null;
     }
   });

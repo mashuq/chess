@@ -19,7 +19,7 @@ const black = 'black',
 
 
 let gamestate = {
-    chess: { board: createBoard(), pieces: setPieces(), engine:chess.create({ PGN : true }), error:'' }
+    chess: { board: createBoard(), pieces: setPieces(), engine:chess.create({ PGN : true }), error:'', currentMove: white }
 }
 
 function createBoard() {
